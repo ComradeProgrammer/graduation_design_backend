@@ -10,7 +10,7 @@ import (
 )
 
 func JsonForJson(url string, method string, header map[string]string, content map[string]interface{}, timeout int) (int, map[string]interface{}, error) {
-	logs.Info("url:%s,method %s,header %v,body %v", url, method, header, content)
+	logs.Info("Send Request url:%s,method %s,header %v,body %v", url, method, header, content)
 
 	bodyJson, err := json.Marshal(content)
 	if err != nil {
@@ -49,7 +49,7 @@ func JsonForJson(url string, method string, header map[string]string, content ma
 }
 
 func StringForJson(url string, method string, header map[string]string, content string, timeout int) (int, map[string]interface{}, error) {
-	logs.Info("url:%s,method %s,header %v,body %s", url, method, header, content)
+	logs.Info("Send Request url:%s,method %s,header %v,body %s", url, method, header, content)
 
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(content)))
 	if err != nil {
