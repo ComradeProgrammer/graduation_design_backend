@@ -29,6 +29,10 @@ func OauthGetToken(code string) (string, string, error) {
 		logs.Error("OauthGetToken Failed,%s", err)
 		return "", "", err
 	}
+	if status!=200{
+		logs.Error("OauthGetToken Failed,Code %d", status)
+		return "", "", fmt.Errorf("OauthGetToken Failed,Code %d", status)
+	}
 	logs.Info("code %d,body %v", status, data)
 	accessToken, ok := data["access_token"].(string)
 	if !ok {

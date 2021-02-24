@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 )
-
+// request body is json,response is also json
 func JsonForJson(url string, method string, header map[string]string, content map[string]interface{}, timeout int) (int, map[string]interface{}, error) {
 	logs.Info("Send Request url:%s,method %s,header %v,body %v", url, method, header, content)
 
@@ -48,6 +48,7 @@ func JsonForJson(url string, method string, header map[string]string, content ma
 	return 200, data, nil
 }
 
+// request body is string,response is json
 func StringForJson(url string, method string, header map[string]string, content string, timeout int) (int, map[string]interface{}, error) {
 	logs.Info("Send Request url:%s,method %s,header %v,body %s", url, method, header, content)
 
@@ -80,4 +81,35 @@ func StringForJson(url string, method string, header map[string]string, content 
 		logs.Error("StringForJson:response not json,%s", string(dataJsonRecv))
 	}
 	return 200, data, nil
+}
+
+// request body is string,response is also json
+func StringForString(url string, method string, header map[string]string, content string, timeout int) (int, string, error) {
+	logs.Info("Send Request url:%s,method %s,header %v,body %s", url, method, header, content)
+
+	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(content)))
+	if err != nil {
+		logs.Fatal("StringForJson:NewRequest failure,%v", err)
+		return -1, "", err
+	}
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		logs.Error("StringForJson:get response failure,%v", err)
+		return -1, "", err
+	}
+	if resp.StatusCode != 200 {
+		logs.Error("StringForJson:response code %d", resp.StatusCode)
+		return resp.StatusCode, "", nil
+	}
+	
+	dataJsonRecv, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	logs.Info("StringForJson:response received %s", string(dataJsonRecv))
+
+	return 200, string(dataJsonRecv), nil
 }
