@@ -4,10 +4,12 @@ import (
 	"graduation_design/internal/app/model"
 	"graduation_design/internal/app/oauth"
 	"graduation_design/internal/pkg/logs"
+	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
+
 //todo:fix refresh session
 
 func Ping(c *gin.Context) {
@@ -83,4 +85,21 @@ func Oauth(c *gin.Context) {
 		"is_admin":currentUser.IsAdmin,
 	})
 
+}
+
+func Test(c *gin.Context){
+	session := sessions.Default(c)
+	accessToken,_:=session.Get("access_token").(string)
+	projectIDStr:=c.Query("projectid")
+	projectID,_:=strconv.Atoi(projectIDStr)
+	err:=model.CheckAndCreateLabels(accessToken,projectID)
+	if err!=nil{
+		c.JSON(400,gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+	c.JSON(200,gin.H{
+		"message":"success",
+	})
 }

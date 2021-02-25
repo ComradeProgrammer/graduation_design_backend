@@ -38,7 +38,7 @@ func GetProjects(c *gin.Context) {
 	tracked, untracked, err := model.GetUserProjects(accessToken)
 	if err != nil {
 		c.JSON(500, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -48,6 +48,9 @@ func GetProjects(c *gin.Context) {
 	})
 }
 
+//route: /project/track?id=<project id>
+//function:start tracking a project
+//return code 200 if succeeded,else failede
 func TrackProject(c *gin.Context) {
 	session := sessions.Default(c)
 	accessToken, ok := session.Get("access_token").(string)
@@ -60,14 +63,14 @@ func TrackProject(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Query("id"), 0, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
 	err = model.TrackProject(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -77,6 +80,9 @@ func TrackProject(c *gin.Context) {
 	return
 }
 
+//route: /project/untrack?id=<project id>
+//function:stop tracking a project
+//return code 200 if succeeded,else failed
 func UntrackProject(c *gin.Context) {
 	session := sessions.Default(c)
 	accessToken, ok := session.Get("access_token").(string)
@@ -89,14 +95,14 @@ func UntrackProject(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Query("id"), 0, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
 	err = model.UntrackProject(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}

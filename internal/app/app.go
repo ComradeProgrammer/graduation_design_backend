@@ -27,6 +27,17 @@ func Run() {
 	server.GET("/projects", handler.GetProjects)
 	server.GET("/projects/track", handler.TrackProject)
 	server.GET("/projects/untrack", handler.UntrackProject)
+	//milestones
+	server.POST("/projects/milestone/create",handler.CreateMilestone)
+	server.GET("/projects/milestone/all",handler.GetAllProjectMilestones)
+	server.GET("/projects/milestone",handler.GetProjectMilestone)
+	server.POST("/projects/milestone/edit",handler.EditMilestone)
+	//issues
+	server.POST("/projects/milestone/issue/create",handler.CreateIssue)
+	server.GET("/projects/milestone/issue",handler.GetAllIssues)
+	//tests
+	server.GET("/test",handler.Test)
 	//run server
+	
 	server.Run(config.APPPORT)
 }
