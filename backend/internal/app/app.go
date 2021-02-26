@@ -32,9 +32,13 @@ func Run() {
 	server.GET("/projects/milestone/all",handler.GetAllProjectMilestones)
 	server.GET("/projects/milestone",handler.GetProjectMilestone)
 	server.POST("/projects/milestone/edit",handler.EditMilestone)
+	server.GET("/projects/milestone/delete",handler.DeleteProjectMilestone)
 	//issues
 	server.POST("/projects/milestone/issue/create",handler.CreateIssue)
-	server.GET("/projects/milestone/issue",handler.GetAllIssues)
+	server.GET("/projects/milestone/issue/all",handler.GetAllIssues)
+	server.GET("/projects/milestone/issue",handler.GetIssue)
+	server.POST("/projects/milestone/issue/edit",handler.EditIssue)
+	server.GET("/projects/milestone/issue/changestate",handler.ChangeIssueState)
 	//tests
 	server.GET("/test",handler.Test)
 	//run server

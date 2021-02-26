@@ -7,6 +7,12 @@
             "label": "fmt",
             "type": "shell",
             "command": "find ./ -name \"*.go\" | xargs gofmt -w"
+        },
+        {
+            "label": "golang codes",
+            "type": "shell",
+            "command": "find . -name \"*.go\"|xargs cat|wc -l  ",
+            "problemMatcher": []
         }
     ]
 }

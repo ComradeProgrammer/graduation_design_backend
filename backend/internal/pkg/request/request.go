@@ -77,8 +77,8 @@ func StringForJson(urlStr string, method string, header map[string]string, conte
 
 	err = json.Unmarshal(dataJsonRecv, &data)
 	if err != nil {
-		logs.Error("FormForJson:response not json,%s", string(dataJsonRecv))
-		return -1,data,fmt.Errorf("FormForJson:response not json,%s", string(dataJsonRecv))
+		logs.Error("StringForJson:response not json,%s", string(dataJsonRecv))
+		return -1,data,fmt.Errorf("StringForJson:response not json,%s", string(dataJsonRecv))
 	}
 	return resp.StatusCode, data, nil
 }
@@ -89,7 +89,7 @@ func StringForString(urlStr string, method string, header map[string]string, con
 
 	req, err := http.NewRequest(method, urlStr, bytes.NewBuffer([]byte(content)))
 	if err != nil {
-		logs.Fatal("StringForJson:NewRequest failure,%v", err)
+		logs.Fatal("StringForString:NewRequest failure,%v", err)
 		return -1, "", err
 	}
 	for k, v := range header {
@@ -98,14 +98,14 @@ func StringForString(urlStr string, method string, header map[string]string, con
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		logs.Error("StringForJson:get response failure,%v", err)
+		logs.Error("StringForString:get response failure,%v", err)
 		return -1, "", err
 	}
 	
 	dataJsonRecv, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	logs.Info("StringForJson:response received %s", string(dataJsonRecv))
+	logs.Info("StringForString:response received %s", string(dataJsonRecv))
 
 	return resp.StatusCode, string(dataJsonRecv), nil
 }

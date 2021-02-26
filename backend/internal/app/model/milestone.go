@@ -106,3 +106,24 @@ func EditMileStone(token string,projectId int,milestoneId int,title,description 
 	logs.Info("CreateMileStone success,response %s",resp)
 	return nil
 }
+
+func DeleteMilestone(token string,projectId int,milestoneId int)error{
+	status,_,err:=request.StringForString(
+		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/milestones/"+strconv.Itoa(milestoneId),
+		"DELETE",
+		map[string]string{
+			"Authorization": "Bearer " + token,
+		},
+		"",
+		5,
+	)
+	if err != nil {
+		logs.Error(" DeleteMileStone:Request Failed,%s", err)
+		return err
+	}
+	if status != 204 {
+		logs.Error(" DeleteMileStone Failed,Code %d", status)
+		return fmt.Errorf(" DeleteMileStone Request Failed,Code %d", status)
+	}
+	return nil
+}
