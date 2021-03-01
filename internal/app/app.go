@@ -20,28 +20,28 @@ func Run() {
 	//set routes
 
 	//login
-	server.GET("/ping", handler.Ping)
+	server.GET("/api/ping", handler.Ping)
 	server.GET("/login", handler.Login)
 	server.GET(config.REDIRECTROUTE, handler.Oauth)
 	//projects
-	server.GET("/projects", handler.GetProjects)
-	server.GET("/projects/track", handler.TrackProject)
-	server.GET("/projects/untrack", handler.UntrackProject)
+	server.GET("/api/projects", handler.GetProjects)
+	server.GET("/api/projects/track", handler.TrackProject)
+	server.GET("/api/projects/untrack", handler.UntrackProject)
 	//milestones
-	server.POST("/projects/milestone/create",handler.CreateMilestone)
-	server.GET("/projects/milestone/all",handler.GetAllProjectMilestones)
-	server.GET("/projects/milestone",handler.GetProjectMilestone)
-	server.POST("/projects/milestone/edit",handler.EditMilestone)
-	server.GET("/projects/milestone/delete",handler.DeleteProjectMilestone)
+	server.POST("/api/projects/milestone/create", handler.CreateMilestone)
+	server.GET("/api/projects/milestone/all", handler.GetAllProjectMilestones)
+	server.GET("/api/projects/milestone", handler.GetProjectMilestone)
+	server.POST("/api/projects/milestone/edit", handler.EditMilestone)
+	server.GET("/api/projects/milestone/delete", handler.DeleteProjectMilestone)
 	//issues
-	server.POST("/projects/milestone/issue/create",handler.CreateIssue)
-	server.GET("/projects/milestone/issue/all",handler.GetAllIssues)
-	server.GET("/projects/milestone/issue",handler.GetIssue)
-	server.POST("/projects/milestone/issue/edit",handler.EditIssue)
-	server.GET("/projects/milestone/issue/changestate",handler.ChangeIssueState)
+	server.POST("/api/projects/milestone/issue/create", handler.CreateIssue)
+	server.GET("/api/projects/milestone/issue/all", handler.GetAllIssues)
+	server.GET("/api/projects/milestone/issue", handler.GetIssue)
+	server.POST("/api/projects/milestone/issue/edit", handler.EditIssue)
+	server.GET("/api/projects/milestone/issue/changestate", handler.ChangeIssueState)
 	//tests
-	server.GET("/test",handler.Test)
+	server.GET("/api/test", handler.Test)
 	//run server
-	
+
 	server.Run(config.APPPORT)
 }
