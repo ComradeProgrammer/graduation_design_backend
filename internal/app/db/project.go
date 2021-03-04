@@ -19,34 +19,31 @@ func (p *ProjectDB) TableName() string {
 }
 
 //untested
-func (p *ProjectDB)DeleteProject()error{
-	logs.Info("Delete Project From DB,id %d,name %s",p.ID,p.NameWithNameSpace)
+func (p *ProjectDB) DeleteProject() error {
+	logs.Info("Delete Project From DB,id %d,name %s", p.ID, p.NameWithNameSpace)
 	return db.Delete(p).Error
 }
 
-
-func (p *ProjectDB)SaveProject()error{
-	logs.Info("Save Project to DB,id %d,name %s",p.ID,p.NameWithNameSpace)
+func (p *ProjectDB) SaveProject() error {
+	logs.Info("Save Project to DB,id %d,name %s", p.ID, p.NameWithNameSpace)
 	return db.Create(p).Error
 }
 
-func FindProjectByID(id int)(ProjectDB,error){
-	var res=ProjectDB{}
-	err:=db.Where("id=?",id).Find(&res).Error
-	if err!=nil{
-		if err!=gorm.ErrRecordNotFound{
-			logs.Error("FindProjectByID:%s",err)
+func FindProjectByID(id int) (ProjectDB, error) {
+	var res = ProjectDB{}
+	err := db.Where("id=?", id).First(&res).Error
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			logs.Error("FindProjectByID:%s", err)
 		}
-		return res,err
+		return res, err
 	}
-	return res,nil
-	
+	return res, nil
+
 }
 
-func GetAllProjects()[]ProjectDB{
-	var res =make([]ProjectDB,0)
+func GetAllProjects() []ProjectDB {
+	var res = make([]ProjectDB, 0)
 	db.Find(&res)
 	return res
 }
-
-

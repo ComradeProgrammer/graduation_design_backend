@@ -34,11 +34,18 @@ func Run() {
 	server.POST("/api/projects/milestone/edit", handler.EditMilestone)
 	server.GET("/api/projects/milestone/delete", handler.DeleteProjectMilestone)
 	//issues
+	server.GET("/api/projects/issue/all", handler.GetAllProjectIssue)
 	server.POST("/api/projects/milestone/issue/create", handler.CreateIssue)
 	server.GET("/api/projects/milestone/issue/all", handler.GetAllIssues)
 	server.GET("/api/projects/milestone/issue", handler.GetIssue)
 	server.POST("/api/projects/milestone/issue/edit", handler.EditIssue)
 	server.GET("/api/projects/milestone/issue/changestate", handler.ChangeIssueState)
+	//code quality
+	server.GET("/api/projects/quality",handler.GetCodeQuality)
+	server.GET("/api/projects/job/log", handler.GetJobLog)
+	server.GET("/api/projects/regex/all", handler.GetAllRegex)
+	server.POST("/api/projects/regex/create", handler.CreateRegex)
+	server.GET("/api/projects/regex/delete", handler.DeleteRegex)
 	//tests
 	server.GET("/api/test", handler.Test)
 	//run server

@@ -12,7 +12,7 @@ const (
 //config for gitlab api
 const (
 	//GITLABURL url of gitlab
-	GITLABURL string = "http://127.0.0.1"
+	GITLABURL    string = "http://127.0.0.1"
 	GITLABAPIURL string = "http://127.0.0.1/api/v4"
 	//APPID appid for calling gitlab api
 	APPID string = "ef7e8b5810623eb01bb81af58a303b12ee0afaf07485ff09cde2a89e38dcf475"
@@ -22,4 +22,12 @@ const (
 	REDIRECTROUTE string = "/oauth/callback"
 	//REDIRECTURI actual url for gitlab oauth redirect
 	REDIRECTURI string = APPHOST + APPPORT + REDIRECTROUTE
+
+	MAINBRANCH string = "master"
+
+	BUILD string= "build-job"
+	TEST string="unit-test-job"
+	COVERAGE string ="check-coverage-job"
+	LINT string="check-quality-job"
+
 )

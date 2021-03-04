@@ -16,6 +16,6 @@ func DBInit(){
 		logs.Error("Open database app.db failed")
 		return
 	}
-	db.AutoMigrate(&ProjectDB{})
+	db.AutoMigrate(&ProjectDB{},&Regex{})
 	logs.Info("Open database app.db succeeded")
 }

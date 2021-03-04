@@ -138,3 +138,24 @@ func ChangeIssueState(token string,projectID int,issueIid int,stateEvent string)
 	logs.Info("ChangeIssueState success,response %s",resp)
 	return nil
 }
+
+func GetAllProjectIssue(token string,projectId int)(string,error){
+	status,resp,err:=request.StringForString(
+		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/issues/",
+		"GET",
+		map[string]string{
+			"Authorization": "Bearer " + token,
+		},
+		"",
+		5,
+	)
+	if err != nil {
+		logs.Error("GetIssue:Request Failed,%s", err)
+		return "",err
+	}
+	if status != 200 {
+		logs.Error("GetIssue Failed,Code %d", status)
+		return "",fmt.Errorf("GetIssue Request Failed,Code %d", status)
+	}
+	return resp,nil
+}

@@ -111,3 +111,25 @@ func UntrackProject(c *gin.Context) {
 	})
 	return
 }
+
+func GetAllProjectIssue(c *gin.Context){
+	session := sessions.Default(c)
+	accessToken,_:=session.Get("access_token").(string)
+	projectIDStr:=c.Query("projectid")
+	projectID,err:=strconv.Atoi(projectIDStr)
+	if err!=nil{
+		c.JSON(400,gin.H{
+			"error":"invalid project id",
+		})
+		return
+	}
+	resp,err:=model.GetAllProjectIssue(accessToken,projectID)
+	if err!=nil{
+		c.JSON(400,gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+	c.Header("Content-Type", "application/json")
+	c.String(200, resp)
+}

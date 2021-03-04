@@ -267,6 +267,12 @@ func ChangeIssueState(c *gin.Context){
 	accessToken,_:=session.Get("access_token").(string)
 	projectIDStr:=c.Query("projectid")
 	projectID,err:=strconv.Atoi(projectIDStr)
+	if err!=nil{
+		c.JSON(400,gin.H{
+			"error":"invalid project_id",
+		})
+		return
+	}
 	issueIiDStr:=c.Query("issue_iid")
 	issueIiD,err:=strconv.Atoi(issueIiDStr)
 	if err!=nil{
