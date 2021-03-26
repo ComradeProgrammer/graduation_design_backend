@@ -8,7 +8,7 @@ import (
 
 type Regex struct {
 	ID        int    `json:"id" gorm:"primary_key;auto_increment"`
-	ProjectID int    `json:"prohect_id" gorm:"column:project_id"`
+	ProjectID int    `json:"project_id" gorm:"column:project_id"`
 	Regex     string `json:"regex" gorm:"column:regex"`
 	RegexType string `json:"regex_type" gorm:"column:regex_type"`
 	Comment   string `json:"comment" gorm:"column:comment"`

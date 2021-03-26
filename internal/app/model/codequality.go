@@ -22,6 +22,11 @@ func CheckQuality(token string, projectID int) (map[string]interface{}, error) {
 	// 	"status": pipelinestatus,
 	// 	"data":   jobs,
 	// }, nil
+	if pipelinestatus == "created" || pipelinestatus == "waiting_for_resource" || pipelinestatus == "preparing" || pipelinestatus == "running" {
+		return map[string]interface{}{
+			"status": pipelinestatus,
+		}, nil
+	}
 	build := checkBuild(jobs)
 	test := checkTest(jobs)
 	lints := checkLint(jobs, projectID, token)
@@ -110,7 +115,7 @@ func checkCoverage(jobs []Job, projectID int, token string) []map[string]interfa
 				logs.Error("checkLint:%s", err)
 			}
 			log, err := GetJobLog(token, projectID, j.Id)
-			logs.Info("log:%s",log)
+			logs.Info("log:%s", log)
 			if err != nil {
 				logs.Error("checkLint %s", err)
 			}
