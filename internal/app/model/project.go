@@ -12,6 +12,7 @@ import (
 
 type Project struct {
 	db.ProjectDB
+	SSHURL string `json:"ssh_url_to_repo"`
 }
 
 // return (tracked projects,untracked projects)
@@ -47,9 +48,9 @@ func TrackProject(token string, id int) error {
 
 }
 
-func UntrackProject(token string,id int)error{
+func UntrackProject(token string, id int) error {
 	logs.Info("UnTrackProject id %d", id)
-	var tmp=db.ProjectDB{ID: id}
+	var tmp = db.ProjectDB{ID: id}
 	return tmp.DeleteProject()
 }
 

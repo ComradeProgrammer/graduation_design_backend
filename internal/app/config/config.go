@@ -23,7 +23,10 @@ const (
 	//REDIRECTURI actual url for gitlab oauth redirect
 	REDIRECTURI string = APPHOST + APPPORT + REDIRECTROUTE
 
+	CACHEDIR string =""
+
 	MAINBRANCH string = "master"
+
 
 	BUILD string= "build-job"
 	TEST string="unit-test-job"
