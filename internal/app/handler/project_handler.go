@@ -67,6 +67,17 @@ func TrackProject(c *gin.Context) {
 		})
 		return
 	}
+	ok, err = model.CheckProjectAuthorization(accessToken, int(id))
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
 	err = model.TrackProject(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -99,6 +110,17 @@ func UntrackProject(c *gin.Context) {
 		})
 		return
 	}
+	ok, err = model.CheckProjectAuthorization(accessToken,int(id))
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
 	err = model.UntrackProject(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -114,13 +136,30 @@ func UntrackProject(c *gin.Context) {
 
 func GetAllProjectIssue(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr:=c.Query("projectid")
 	projectID,err:=strconv.Atoi(projectIDStr)
 	if err!=nil{
 		c.JSON(400,gin.H{
 			"error":"invalid project id",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	resp,err:=model.GetAllProjectIssue(accessToken,projectID)

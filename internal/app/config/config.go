@@ -23,14 +23,15 @@ const (
 	//REDIRECTURI actual url for gitlab oauth redirect
 	REDIRECTURI string = APPHOST + APPPORT + REDIRECTROUTE
 
-	CACHEDIR string =""
+	CACHEDIR string = ""
 
 	MAINBRANCH string = "master"
 
+	//students' ci must contain these things
+	BUILD    string = "build-job"
+	TEST     string = "unit-test-job"
+	COVERAGE string = "check-coverage-job"
+	LINT     string = "check-quality-job"
 
-	BUILD string= "build-job"
-	TEST string="unit-test-job"
-	COVERAGE string ="check-coverage-job"
-	LINT string="check-quality-job"
-
+	MAINPAGE string = "http://127.0.0.1:8081"
 )

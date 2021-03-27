@@ -10,9 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetCodeQuality(c *gin.Context){
+func GetCodeQuality(c *gin.Context) {
 	session := sessions.Default(c)
-	accessToken, _ := session.Get("access_token").(string)
+	accessToken, ok := session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr := c.Query("projectid")
 	projectID, err := strconv.Atoi(projectIDStr)
 	if err != nil {
@@ -21,7 +27,18 @@ func GetCodeQuality(c *gin.Context){
 		})
 		return
 	}
-	data,err:=model.CheckQuality(accessToken,projectID)
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
+	data, err := model.CheckQuality(accessToken, projectID)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -35,13 +52,30 @@ func GetCodeQuality(c *gin.Context){
 
 func GetJobLog(c *gin.Context) {
 	session := sessions.Default(c)
-	accessToken, _ := session.Get("access_token").(string)
+	accessToken, ok := session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr := c.Query("projectid")
 	projectID, err := strconv.Atoi(projectIDStr)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": "invalid projectid",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	jobIDStr := c.Query("jobid")
@@ -66,16 +100,31 @@ func GetJobLog(c *gin.Context) {
 }
 
 func GetAllRegex(c *gin.Context) {
-	//session := sessions.Default(c)
-	//accessToken, _ := session.Get("access_token").(string)
-
-	//todo fix:check permission:
+	session := sessions.Default(c)
+	accessToken, ok := session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr := c.Query("projectid")
 	projectID, err := strconv.Atoi(projectIDStr)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": "invalid projectid",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	data := model.GetAllRegex(projectID)
@@ -86,7 +135,14 @@ func GetAllRegex(c *gin.Context) {
 }
 
 func CreateRegex(c *gin.Context) {
-	//todo fix:check permission
+	session := sessions.Default(c)
+	accessToken, ok := session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	reqData := make(map[string]interface{})
 	c.BindJSON(&reqData)
 	projectIdFloat, ok := reqData["project_id"].(float64)
@@ -97,6 +153,18 @@ func CreateRegex(c *gin.Context) {
 		return
 	}
 	projectId := int(projectIdFloat)
+
+	ok, err := model.CheckProjectAuthorization(accessToken, projectId)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
 	regex, ok := reqData["regex"].(string)
 	if !ok || regex == "" {
 		c.JSON(400, gin.H{
@@ -118,7 +186,7 @@ func CreateRegex(c *gin.Context) {
 		})
 		return
 	}
-	err := model.CreateRegex(projectId, regex, regexType, comment)
+	err = model.CreateRegex(projectId, regex, regexType, comment)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": "invalid projectid",
@@ -131,6 +199,33 @@ func CreateRegex(c *gin.Context) {
 }
 
 func DeleteRegex(c *gin.Context) {
+	session := sessions.Default(c)
+	accessToken, ok := session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+	projectIDStr := c.Query("projectid")
+	projectID, err := strconv.Atoi(projectIDStr)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid projectid",
+		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+	}
+
 	regexIDStr := c.Query("regexid")
 	regexID, err := strconv.Atoi(regexIDStr)
 	if err != nil {
@@ -139,6 +234,17 @@ func DeleteRegex(c *gin.Context) {
 		})
 		return
 	}
+	regex, err := model.FindRegex(regexID)
+	if err != nil {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
+
+	if regex.ProjectID != projectID {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
+
 	model.DeleteRegex(regexID)
 	c.JSON(200, gin.H{
 		"message": "success",

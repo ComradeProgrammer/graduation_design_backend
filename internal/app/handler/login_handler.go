@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"graduation_design/internal/app/config"
 	"graduation_design/internal/app/model"
 	"graduation_design/internal/app/oauth"
 	"graduation_design/internal/pkg/logs"
@@ -41,8 +42,7 @@ func Login(c *gin.Context) {
 		c.Redirect(302, oauth.GenOauthUrl())
 	}
 	//have already logined，jump to main page
-	//TODO:Implement
-	c.Redirect(302, "http://127.0.0.1:8081")
+	c.Redirect(302, config.MAINPAGE)
 
 }
 
@@ -76,16 +76,15 @@ func Oauth(c *gin.Context) {
 	logs.Info("oauth:session saved,token:%s,refresh_token:%s", accessToken, refreshToken)
 	//have already logined,
 	//TODO:Implement jump to main page
-	//TODO: remove debug output
-	c.Redirect(302, "http://127.0.0.1:8081")
-	// c.JSON(200, gin.H{
-	// 	"access_token":  accessToken,
-	// 	"refresh_token": refreshToken,
-	// 	"id":            currentUser.Id,
-	// 	"user_name":     currentUser.UserName,
-	// 	"is_admin":      currentUser.IsAdmin,
-	// })
+	c.Redirect(302, config.MAINPAGE)
 
+}
+
+func Logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+	c.Redirect(302, config.GITLABURL)
 }
 
 func Test(c *gin.Context) {

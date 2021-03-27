@@ -11,7 +11,13 @@ import (
 
 func CreateIssue(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	reqData:=make(map[string]interface{})
 	c.BindJSON(&reqData)
 	projectIdFloat,ok:=reqData["project_id"].(float64)
@@ -22,6 +28,17 @@ func CreateIssue(c *gin.Context){
 		return
 	}
 	projectId:=int(projectIdFloat)
+	ok, err := model.CheckProjectAuthorization(accessToken, projectId)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
 	milestoneIdFloat,ok:=reqData["milestone_id"].(float64)
 	if !ok{
 		c.JSON(400,gin.H{
@@ -88,7 +105,7 @@ func CreateIssue(c *gin.Context){
 		})
 		return
 	}
-	err:=model.CreateIssue(accessToken,projectId,milestoneId,
+	err=model.CreateIssue(accessToken,projectId,milestoneId,
 	title,description,startDateStr,dueDateStr,typeTag,priorityTag)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -103,13 +120,30 @@ func CreateIssue(c *gin.Context){
 
 func GetAllIssues(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr:=c.Query("projectid")
 	projectID,err:=strconv.Atoi(projectIDStr)
 	if err!=nil{
 		c.JSON(400,gin.H{
 			"error":"invalid project id",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	milestoneIDStr:=c.Query("milestoneid")
@@ -132,13 +166,30 @@ func GetAllIssues(c *gin.Context){
 }
 func GetIssue(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr:=c.Query("projectid")
 	projectID,err:=strconv.Atoi(projectIDStr)
 	if err!=nil{
 		c.JSON(400,gin.H{
 			"error":"invalid project id",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	issueIiDStr:=c.Query("issue_iid")
@@ -162,7 +213,13 @@ func GetIssue(c *gin.Context){
 
 func EditIssue(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	reqData:=make(map[string]interface{})
 	c.BindJSON(&reqData)
 	projectIdFloat,ok:=reqData["project_id"].(float64)
@@ -173,6 +230,17 @@ func EditIssue(c *gin.Context){
 		return
 	}
 	projectId:=int(projectIdFloat)
+	ok, err := model.CheckProjectAuthorization(accessToken, projectId)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
 	milestoneIDFloat,ok:=reqData["milestone_id"].(float64)
 	if !ok{
 		c.JSON(400,gin.H{
@@ -248,7 +316,7 @@ func EditIssue(c *gin.Context){
 		})
 		return
 	}
-	err:=model.EditIssue(accessToken,projectId,milestoneID,issueIiD,
+	err=model.EditIssue(accessToken,projectId,milestoneID,issueIiD,
 		title,description,startDateStr,dueDateStr,typeTag,priorityTag)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -264,13 +332,30 @@ func EditIssue(c *gin.Context){
 
 func ChangeIssueState(c *gin.Context){
 	session := sessions.Default(c)
-	accessToken,_:=session.Get("access_token").(string)
+	accessToken,ok:=session.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 	projectIDStr:=c.Query("projectid")
 	projectID,err:=strconv.Atoi(projectIDStr)
 	if err!=nil{
 		c.JSON(400,gin.H{
 			"error":"invalid project_id",
 		})
+		return
+	}
+	ok, err = model.CheckProjectAuthorization(accessToken, projectID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
 		return
 	}
 	issueIiDStr:=c.Query("issue_iid")

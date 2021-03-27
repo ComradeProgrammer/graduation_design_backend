@@ -26,15 +26,27 @@ func GetProjectStatistic(c *gin.Context) {
 		return
 	}
 
-	result,err:=model.AnalysisProject(accessToken,int(id))
+	ok, err = model.CheckProjectAuthorization(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	c.JSON(200,gin.H{
-		"data":result,
+	if !ok {
+		c.JSON(401, gin.H{"message": "unauthorized"})
+		return
+	}
+
+	result, err := model.AnalysisProject(accessToken, int(id))
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"data": result,
 	})
-	return 
+	return
 }

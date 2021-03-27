@@ -22,7 +22,9 @@ func Run() {
 	//login
 	server.GET("/api/ping", handler.Ping)
 	server.GET("/login", handler.Login)
+	server.GET("/logout", handler.Logout)
 	server.GET(config.REDIRECTROUTE, handler.Oauth)
+
 	//projects
 	server.GET("/api/projects", handler.GetProjects)
 	server.GET("/api/projects/track", handler.TrackProject)
@@ -41,13 +43,13 @@ func Run() {
 	server.POST("/api/projects/milestone/issue/edit", handler.EditIssue)
 	server.GET("/api/projects/milestone/issue/changestate", handler.ChangeIssueState)
 	//code quality
-	server.GET("/api/projects/quality",handler.GetCodeQuality)
+	server.GET("/api/projects/quality", handler.GetCodeQuality)
 	server.GET("/api/projects/job/log", handler.GetJobLog)
 	server.GET("/api/projects/regex/all", handler.GetAllRegex)
 	server.POST("/api/projects/regex/create", handler.CreateRegex)
 	server.GET("/api/projects/regex/delete", handler.DeleteRegex)
 	//analysis
-	server.GET("/api/projects/statistic",handler.GetProjectStatistic)
+	server.GET("/api/projects/statistic", handler.GetProjectStatistic)
 	//tests
 	server.GET("/api/test", handler.Test)
 	//run server
