@@ -8,7 +8,6 @@ import (
 	"strconv"
 )
 
-// todo: remove restriction of pagination in gitlab source code
 
 func CreateIssue(token string,projectID int,milestoneId int,
 	title string,description string,startDate,dueDate string,
@@ -140,8 +139,8 @@ func ChangeIssueState(token string,projectID int,issueIid int,stateEvent string)
 }
 
 func GetAllProjectIssue(token string,projectId int)(string,error){
-	status,resp,err:=request.StringForString(
-		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/issues/",
+	resp,err:=request.StringForStringWithPagination(
+		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/issues?per_page=100",
 		"GET",
 		map[string]string{
 			"Authorization": "Bearer " + token,
@@ -153,9 +152,9 @@ func GetAllProjectIssue(token string,projectId int)(string,error){
 		logs.Error("GetIssue:Request Failed,%s", err)
 		return "",err
 	}
-	if status != 200 {
-		logs.Error("GetIssue Failed,Code %d", status)
-		return "",fmt.Errorf("GetIssue Request Failed,Code %d", status)
-	}
+	// if status != 200 {
+	// 	logs.Error("GetIssue Failed,Code %d", status)
+	// 	return "",fmt.Errorf("GetIssue Request Failed,Code %d", status)
+	// }
 	return resp,nil
 }

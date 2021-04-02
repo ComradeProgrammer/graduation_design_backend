@@ -4,8 +4,24 @@ import (
 	"graduation_design/internal/app/config"
 	"graduation_design/internal/pkg/git"
 )
+//这次修改之后，我究竟需要怎样的需求呢？
+/*
+	1.项目概况 应当提供：
+	项目代码总行数 项目总commit数 项目总issue数 项目总Disscution数 项目总MR数
+	项目所有参与者 项目语言结构
+	2. 开发者视角 对于每一个开发者展示 
+		此人提交代码总行数
+		此人提交的语言分布
+		此人commit列表或概况图
+		此人issue列表或概况图
+		此人comment列表或概况图
+	3. 语言视角 提供每一种语言的各位作者贡献分布
+	4. gitlog commit分析 提供commit列表并进行问题分析
+	5. 活跃度视角 提供近14天内的commmit issue discussions MR报表及分析
 
-func AnalysisProject(token string, projectId int) (map[string]interface{}, error) {
+*/
+
+func AnalysisProjectOverview(token string, projectId int) (map[string]interface{}, error) {
 	prj, err := getProjectFromGitlab(token, projectId)
 	if err != nil {
 		return nil, err

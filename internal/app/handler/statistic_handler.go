@@ -38,7 +38,7 @@ func GetProjectStatistic(c *gin.Context) {
 		return
 	}
 
-	result, err := model.AnalysisProject(accessToken, int(id))
+	result, err := model.AnalysisProjectOverview(accessToken, int(id))
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),

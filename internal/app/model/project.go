@@ -84,8 +84,8 @@ func getProjectFromGitlab(token string, id int) (Project, error) {
 
 func getAllProjectsFromGitlab(token string) ([]Project, error) {
 	logs.Info("getAllProjectsFromGitlab")
-	status, resp, err := request.StringForString(
-		config.GITLABAPIURL+"/projects",
+	resp, err := request.StringForStringWithPagination(
+		config.GITLABAPIURL+"/projects?per_page=100",
 		"GET",
 		map[string]string{
 			"Authorization": "Bearer " + token,
@@ -97,10 +97,10 @@ func getAllProjectsFromGitlab(token string) ([]Project, error) {
 		logs.Error("getAllProjectsFromGitlab:Request Failed,%s", err)
 		return nil, err
 	}
-	if status != 200 {
-		logs.Error("getAllProjectsFromGitlab Request Failed,Code %d", status)
-		return nil, fmt.Errorf("getAllProjectsFromGitlab Request Failed,Code %d", status)
-	}
+	// if status != 200 {
+	// 	logs.Error("getAllProjectsFromGitlab Request Failed,Code %d", status)
+	// 	return nil, fmt.Errorf("getAllProjectsFromGitlab Request Failed,Code %d", status)
+	// }
 	var res = make([]Project, 0)
 	err = json.Unmarshal([]byte(resp), &res)
 	if err != nil {

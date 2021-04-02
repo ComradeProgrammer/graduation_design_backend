@@ -83,7 +83,7 @@ func StringForJson(urlStr string, method string, header map[string]string, conte
 	return resp.StatusCode, data, nil
 }
 
-// request body is string,response is also json
+// request body is string,response is also string
 func StringForString(urlStr string, method string, header map[string]string, content string, timeout int) (int, string, error) {
 	logs.Info("Send Request url:%s,method %s,header %v,body %s", urlStr, method, header, content)
 
