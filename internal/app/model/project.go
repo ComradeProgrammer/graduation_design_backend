@@ -12,7 +12,6 @@ import (
 
 type Project struct {
 	db.ProjectDB
-	SSHURL string `json:"ssh_url_to_repo"`
 }
 
 // return (tracked projects,untracked projects)

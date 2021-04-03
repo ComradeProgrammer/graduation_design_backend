@@ -49,7 +49,11 @@ func Run() {
 	server.POST("/api/projects/regex/create", handler.CreateRegex)
 	server.GET("/api/projects/regex/delete", handler.DeleteRegex)
 	//analysis
-	server.GET("/api/projects/statistic", handler.GetProjectStatistic)
+	server.GET("/api/projects/statistic", handler.GetProjectOverviewStatistic)
+	server.GET("/api/projects/statistic/user", handler.GetProjectUserStatistic)
+	server.GET("/api/projects/statistic/language", handler.GetProjectLanguageStatistic)
+	server.GET("/api/projects/statistic/commit", handler.GetProjectCommitStatistic)
+	server.GET("/api/projects/statistic/activity",handler.GetProjectActivityStatistic)
 	//tests
 	server.GET("/api/test", handler.Test)
 	//run server

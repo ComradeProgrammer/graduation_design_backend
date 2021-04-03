@@ -147,3 +147,29 @@ func FormForJson(urlStr string, method string, header map[string]string, content
 	}
 	return resp.StatusCode, data, nil
 }
+// request body is string,response is also string
+func StringForStringWithHeader(urlStr string, method string, header map[string]string, content string, timeout int) (http.Header, string, error) {
+	logs.Info("Send Request url:%s,method %s,header %v,body %s", urlStr, method, header, content)
+
+	req, err := http.NewRequest(method, urlStr, bytes.NewBuffer([]byte(content)))
+	if err != nil {
+		logs.Fatal("StringForString:NewRequest failure,%v", err)
+		return nil, "", err
+	}
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		logs.Error("StringForString:get response failure,%v", err)
+		return nil, "", err
+	}
+	
+	dataJsonRecv, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	logs.Info("StringForString:response received %s", string(dataJsonRecv))
+
+	return resp.Header, string(dataJsonRecv), nil
+}

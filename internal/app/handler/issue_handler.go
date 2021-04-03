@@ -154,7 +154,7 @@ func GetAllIssues(c *gin.Context){
 		})
 		return
 	}
-	resp,err:=model.GetAllIssues(accessToken,projectID,milestoneID)
+	resp,err:=model.GetAllIssuesForMilestone(accessToken,projectID,milestoneID)
 	if err!=nil{
 		c.JSON(400,gin.H{
 			"error":err.Error(),

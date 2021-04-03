@@ -23,7 +23,6 @@ func main() {
 
 	err=res.ReadAllCommit(func(gitlog string){
 		fmt.Println(gitlog)
-		res,_:=git.ResolveGitlog(gitlog)
 		fmt.Println(res)
 
 	})

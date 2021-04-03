@@ -67,9 +67,9 @@ func (g *Git) BlameAllFile(files []string, callbacks ...GitBlameLineCallback) er
 }
 
 func (g *Git) ReadAllCommit(callbacks ...GitCommitCallback) error {
-	// command is  git log --pretty=format:"%h %an %ai %s" --shortstat
+	// command is  git log --pretty=format:"%H %an %ai %s" --shortstat
 	//don't know why " needs to be removed but it works
-	res, err := RunCommand(g.FolderName, "git", "log", "--pretty=format:%h %an %ai %s", "--shortstat")
+	res, err := RunCommand(g.FolderName, "git", "log", "--pretty=format:%H %an %ai %s", "--shortstat")
 	if err != nil {
 		return err
 	}

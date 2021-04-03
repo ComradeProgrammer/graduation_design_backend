@@ -7,15 +7,15 @@ import (
 )
 
 type GitCommit struct {
-	Hash        string
-	Author      string
-	Date        string
-	Time        string
-	Title       string
-	FileChanged int
-	Insertions  int
-	Deletions   int
-	Total       int
+	Hash        string `json:"hash"`
+	Author      string `json:"author"`
+	Date        string `json:"date"`
+	Time        string `json:"time"`
+	Title       string `json:"title"`
+	FileChanged int	`json:"file_changed"`
+	Insertions  int`json:"insertions"`
+	Deletions   int `json:"deletions"`
+	Total       int`json:"total"`
 }
 
 var testString = `
