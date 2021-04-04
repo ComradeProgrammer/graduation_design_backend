@@ -9,13 +9,13 @@ import (
 
 var db *gorm.DB
 
-func DBInit(){
+func DBInit() {
 	var err error
 	db, err = gorm.Open("sqlite3", "app.db")
-	if err!=nil{
+	if err != nil {
 		logs.Error("Open database app.db failed")
 		return
 	}
-	db.AutoMigrate(&ProjectDB{},&Regex{})
+	db.AutoMigrate(&ProjectDB{}, &Regex{})
 	logs.Info("Open database app.db succeeded")
 }

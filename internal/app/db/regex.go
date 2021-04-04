@@ -52,10 +52,10 @@ func (p *Regex) UpdateRegex() error {
 	return db.Save(p).Error
 }
 
-func FindRegexByID(id int)(Regex,error){
-	var res=Regex{}
+func FindRegexByID(id int) (Regex, error) {
+	var res = Regex{}
 	err := db.Where("id=?", id).First(&res).Error
-	return res,err
+	return res, err
 }
 func DeleteRegex(id int) error {
 	return db.Delete(&Regex{ID: id}).Error

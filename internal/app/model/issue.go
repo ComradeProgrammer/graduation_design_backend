@@ -9,7 +9,6 @@ import (
 	"strconv"
 )
 
-
 func CreateIssue(token string, projectID int, milestoneId int,
 	title string, description string, startDate, dueDate string,
 	typeTag, priorityTag string) error {
@@ -159,7 +158,7 @@ func GetAllProjectIssue(token string, projectId int) (string, error) {
 	return resp, nil
 }
 
-func GetAllProjectIssueInObject(token string, projectId int) ([]map[string]interface{}, error){
+func GetAllProjectIssueInObject(token string, projectId int) ([]map[string]interface{}, error) {
 	resp, err := request.StringForStringWithPagination(
 		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/issues?per_page=100",
 		"GET",
@@ -173,11 +172,10 @@ func GetAllProjectIssueInObject(token string, projectId int) ([]map[string]inter
 		logs.Error("GetIssue:Request Failed,%s", err)
 		return nil, err
 	}
-	var ret=make([]map[string]interface{},0)
-	json.Unmarshal([]byte(resp),&ret)
+	var ret = make([]map[string]interface{}, 0)
+	json.Unmarshal([]byte(resp), &ret)
 	return ret, nil
 }
-
 
 func GetProjectIssueNum(token string, projectId int) (int, error) {
 	header, _, err := request.StringForStringWithHeader(
@@ -192,9 +190,9 @@ func GetProjectIssueNum(token string, projectId int) (int, error) {
 
 	if err != nil {
 		logs.Error("GetIssueStatistic failed,%s", err)
-		return -1,err
+		return -1, err
 	}
-	total,err:=strconv.Atoi(header.Get("x-total"))
-	return total,nil
+	total, err := strconv.Atoi(header.Get("x-total"))
+	return total, nil
 
 }

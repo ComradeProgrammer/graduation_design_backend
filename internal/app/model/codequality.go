@@ -158,7 +158,7 @@ func CreateRegex(projectID int, regex string, regexType string, comment string) 
 func DeleteRegex(id int) error {
 	return db.DeleteRegex(id)
 }
-func FindRegex(id int)(db.Regex,error){
+func FindRegex(id int) (db.Regex, error) {
 	return db.FindRegexByID(id)
 }
 func findIndexByRegex(regexStr string, str string) (int, int, error) {

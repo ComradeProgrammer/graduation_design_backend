@@ -8,21 +8,20 @@ import (
 	"graduation_design/internal/pkg/request"
 )
 
-type User struct{
-	Id int `json:"id"`
+type User struct {
+	Id       int    `json:"id"`
 	UserName string `json:"username"`
-	Avatar string	`json:"avatar_url"`
-	IsAdmin bool `json:"is_admin"`
-
+	Avatar   string `json:"avatar_url"`
+	IsAdmin  bool   `json:"is_admin"`
 }
 
-func GetCurrentUser(token string)(*User,error){
+func GetCurrentUser(token string) (*User, error) {
 	logs.Info("GetCurrentUser")
-	status,resp,err:=request.StringForString(
+	status, resp, err := request.StringForString(
 		config.GITLABAPIURL+"/user",
 		"GET",
 		map[string]string{
-			"Authorization":"Bearer "+token,
+			"Authorization": "Bearer " + token,
 		},
 		"",
 		5,
@@ -31,15 +30,15 @@ func GetCurrentUser(token string)(*User,error){
 		logs.Error("GetCurrentUser:Request Failed,%s", err)
 		return nil, err
 	}
-	if status!=200{
+	if status != 200 {
 		logs.Error("GetCurrentUser Request Failed,Code %d", status)
 		return nil, fmt.Errorf("GetCurrentUser Request Failed,Code %d", status)
 	}
-	var tmp=User{}
-	err=json.Unmarshal([]byte(resp),&tmp)
+	var tmp = User{}
+	err = json.Unmarshal([]byte(resp), &tmp)
 	if err != nil {
 		logs.Error("GetCurrentUser:marshal Failed,%s", err)
 		return nil, err
 	}
-	return &tmp,nil
+	return &tmp, nil
 }

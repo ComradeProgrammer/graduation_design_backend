@@ -8,8 +8,8 @@ import (
 	"strconv"
 )
 
-func GetProjectMrNum(token string,projectId int)(int,error){
-	header,_,err:=request.StringForStringWithHeader(
+func GetProjectMrNum(token string, projectId int) (int, error) {
+	header, _, err := request.StringForStringWithHeader(
 		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/merge_requests?per_page=100",
 		"GET",
 		map[string]string{
@@ -20,13 +20,13 @@ func GetProjectMrNum(token string,projectId int)(int,error){
 	)
 	if err != nil {
 		logs.Error("GetIssueStatistic failed,%s", err)
-		return -1,err
+		return -1, err
 	}
-	total,err:=strconv.Atoi(header.Get("x-total"))
-	return total,nil
+	total, err := strconv.Atoi(header.Get("x-total"))
+	return total, nil
 }
 
-func GetAllProjectMrInObject(token string, projectId int) ([]map[string]interface{}, error){
+func GetAllProjectMrInObject(token string, projectId int) ([]map[string]interface{}, error) {
 	resp, err := request.StringForStringWithPagination(
 		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectId)+"/merge_requests?per_page=100",
 		"GET",
@@ -40,7 +40,7 @@ func GetAllProjectMrInObject(token string, projectId int) ([]map[string]interfac
 		logs.Error("GetIssue:Request Failed,%s", err)
 		return nil, err
 	}
-	var ret=make([]map[string]interface{},0)
-	json.Unmarshal([]byte(resp),&ret)
+	var ret = make([]map[string]interface{}, 0)
+	json.Unmarshal([]byte(resp), &ret)
 	return ret, nil
 }

@@ -43,7 +43,7 @@ func GetCommit(token string, projectID int, sha string) (map[string]interface{},
 	return resp, nil
 }
 
-func GetAllCommitsInMap(token string,projectID int)(map[string]GitlabCommit,error){
+func GetAllCommitsInMap(token string, projectID int) (map[string]GitlabCommit, error) {
 	resp, err := request.StringForStringWithPagination(
 		config.GITLABAPIURL+"/projects/"+strconv.Itoa(projectID)+"/repository/commits/?per_page=100",
 		"GET",
@@ -53,33 +53,33 @@ func GetAllCommitsInMap(token string,projectID int)(map[string]GitlabCommit,erro
 		"",
 		5,
 	)
-	if err!=nil{
-		logs.Error("GetAllCommitsInMap:%s",err.Error())
-		return nil,err
+	if err != nil {
+		logs.Error("GetAllCommitsInMap:%s", err.Error())
+		return nil, err
 	}
-	var commitList=make([]GitlabCommit,0)
-	err=json.Unmarshal([]byte(resp),&commitList)
-	if err!=nil{
-		logs.Error("GetAllCommitsInMap:%s",err.Error())
-		return nil,err
+	var commitList = make([]GitlabCommit, 0)
+	err = json.Unmarshal([]byte(resp), &commitList)
+	if err != nil {
+		logs.Error("GetAllCommitsInMap:%s", err.Error())
+		return nil, err
 	}
-	var commitMap=make(map[string]GitlabCommit)
-	for _,c:=range commitList{
-		commitMap[c.ID]=c
-	} 
-	return commitMap,nil
+	var commitMap = make(map[string]GitlabCommit)
+	for _, c := range commitList {
+		commitMap[c.ID] = c
+	}
+	return commitMap, nil
 
 }
 
-func mergeCommitsFromGitAndGitlab(fromGit[]git.GitCommit,fromGitlab map[string]GitlabCommit)([]FullCommit,map[string]string){
-	var res=make([]FullCommit,len(fromGit))
-	var gitToGitlab=make(map[string]string)
-	for i,c:=range fromGit{
-		res[i].GitCommit=c
-		res[i].GitlabUser=fromGitlab[c.Hash].GitlabUser
-		res[i].WebUrl=fromGitlab[c.Hash].WebUrl
-		gitToGitlab[res[i].Author]=fromGitlab[c.Hash].GitlabUser
+func mergeCommitsFromGitAndGitlab(fromGit []git.GitCommit, fromGitlab map[string]GitlabCommit) ([]FullCommit, map[string]string) {
+	var res = make([]FullCommit, len(fromGit))
+	var gitToGitlab = make(map[string]string)
+	for i, c := range fromGit {
+		res[i].GitCommit = c
+		res[i].GitlabUser = fromGitlab[c.Hash].GitlabUser
+		res[i].WebUrl = fromGitlab[c.Hash].WebUrl
+		gitToGitlab[res[i].Author] = fromGitlab[c.Hash].GitlabUser
 	}
 
-	return res,gitToGitlab
+	return res, gitToGitlab
 }

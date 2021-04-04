@@ -53,7 +53,7 @@ func Run() {
 	server.GET("/api/projects/statistic/user", handler.GetProjectUserStatistic)
 	server.GET("/api/projects/statistic/language", handler.GetProjectLanguageStatistic)
 	server.GET("/api/projects/statistic/commit", handler.GetProjectCommitStatistic)
-	server.GET("/api/projects/statistic/activity",handler.GetProjectActivityStatistic)
+	server.GET("/api/projects/statistic/activity", handler.GetProjectActivityStatistic)
 	//tests
 	server.GET("/api/test", handler.Test)
 	//run server

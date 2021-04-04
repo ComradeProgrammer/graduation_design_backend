@@ -29,7 +29,7 @@ func OauthGetToken(code string) (string, string, error) {
 		logs.Error("OauthGetToken Failed,%s", err)
 		return "", "", err
 	}
-	if status!=200{
+	if status != 200 {
 		logs.Error("OauthGetToken Failed,Code %d", status)
 		return "", "", fmt.Errorf("OauthGetToken Failed,Code %d", status)
 	}

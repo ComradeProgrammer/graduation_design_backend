@@ -21,12 +21,12 @@ func main() {
 	// 	fmt.Println(git.ResolveBlame(blame))
 	// })
 
-	err=res.ReadAllCommit(func(gitlog string){
+	err = res.ReadAllCommit(func(gitlog string) {
 		fmt.Println(gitlog)
 		fmt.Println(res)
 
 	})
-	if err!=nil{
+	if err != nil {
 		fmt.Println(err.Error())
 	}
 

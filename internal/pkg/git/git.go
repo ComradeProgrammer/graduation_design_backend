@@ -73,16 +73,16 @@ func (g *Git) ReadAllCommit(callbacks ...GitCommitCallback) error {
 	if err != nil {
 		return err
 	}
-	strs:=strings.Split(res,"\n")
-	for i:=0;i<len(strs);i=i+3{
-		commitstr:=strs[i]+"\n"
-		if i+1<len(strs){
-			commitstr+=strs[i+1]+"\n"
+	strs := strings.Split(res, "\n")
+	for i := 0; i < len(strs); i = i + 3 {
+		commitstr := strs[i] + "\n"
+		if i+1 < len(strs) {
+			commitstr += strs[i+1] + "\n"
 		}
-		if i+2<len(strs){
-			commitstr+=strs[i+2]
+		if i+2 < len(strs) {
+			commitstr += strs[i+2]
 		}
-		for _,callback:=range callbacks{
+		for _, callback := range callbacks {
 			callback(commitstr)
 		}
 	}

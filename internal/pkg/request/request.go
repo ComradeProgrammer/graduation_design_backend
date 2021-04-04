@@ -27,8 +27,8 @@ func JsonForJson(urlStr string, method string, header map[string]string, content
 	for k, v := range header {
 		req.Header.Set(k, v)
 	}
-	req.Header.Set("Content-Type","application/json")
-	logs.Info("Send Request url:%s,method %s,header %v,body %v", urlStr, method, header,string(bodyJson))
+	req.Header.Set("Content-Type", "application/json")
+	logs.Info("Send Request url:%s,method %s,header %v,body %v", urlStr, method, header, string(bodyJson))
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -45,7 +45,7 @@ func JsonForJson(urlStr string, method string, header map[string]string, content
 	err = json.Unmarshal(dataJsonRecv, &data)
 	if err != nil {
 		logs.Error("FormForJson:response not json,%s", string(dataJsonRecv))
-		return -1,data,fmt.Errorf("FormForJson:response not json,%s", string(dataJsonRecv))
+		return -1, data, fmt.Errorf("FormForJson:response not json,%s", string(dataJsonRecv))
 	}
 	return resp.StatusCode, data, nil
 }
@@ -78,7 +78,7 @@ func StringForJson(urlStr string, method string, header map[string]string, conte
 	err = json.Unmarshal(dataJsonRecv, &data)
 	if err != nil {
 		logs.Error("StringForJson:response not json,%s", string(dataJsonRecv))
-		return -1,data,fmt.Errorf("StringForJson:response not json,%s", string(dataJsonRecv))
+		return -1, data, fmt.Errorf("StringForJson:response not json,%s", string(dataJsonRecv))
 	}
 	return resp.StatusCode, data, nil
 }
@@ -101,7 +101,7 @@ func StringForString(urlStr string, method string, header map[string]string, con
 		logs.Error("StringForString:get response failure,%v", err)
 		return -1, "", err
 	}
-	
+
 	dataJsonRecv, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
@@ -113,9 +113,9 @@ func StringForString(urlStr string, method string, header map[string]string, con
 // request body is post for,response is also json
 func FormForJson(urlStr string, method string, header map[string]string, content map[string]string, timeout int) (int, map[string]interface{}, error) {
 
-	body:=url.Values{}
-	for k,v:=range content{
-		body.Set(k,v)
+	body := url.Values{}
+	for k, v := range content {
+		body.Set(k, v)
 	}
 	req, err := http.NewRequest(method, urlStr, bytes.NewBuffer([]byte(body.Encode())))
 	if err != nil {
@@ -126,7 +126,7 @@ func FormForJson(urlStr string, method string, header map[string]string, content
 		req.Header.Set(k, v)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	logs.Info("Send Request url:%s,method %s,header %v,body %v", urlStr, method, header,body.Encode())
+	logs.Info("Send Request url:%s,method %s,header %v,body %v", urlStr, method, header, body.Encode())
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -143,10 +143,11 @@ func FormForJson(urlStr string, method string, header map[string]string, content
 	err = json.Unmarshal(dataJsonRecv, &data)
 	if err != nil {
 		logs.Error("FormForJson:response not json,%s", string(dataJsonRecv))
-		return -1,data,fmt.Errorf("FormForJson:response not json,%s", string(dataJsonRecv))
+		return -1, data, fmt.Errorf("FormForJson:response not json,%s", string(dataJsonRecv))
 	}
 	return resp.StatusCode, data, nil
 }
+
 // request body is string,response is also string
 func StringForStringWithHeader(urlStr string, method string, header map[string]string, content string, timeout int) (http.Header, string, error) {
 	logs.Info("Send Request url:%s,method %s,header %v,body %s", urlStr, method, header, content)
@@ -165,7 +166,7 @@ func StringForStringWithHeader(urlStr string, method string, header map[string]s
 		logs.Error("StringForString:get response failure,%v", err)
 		return nil, "", err
 	}
-	
+
 	dataJsonRecv, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
