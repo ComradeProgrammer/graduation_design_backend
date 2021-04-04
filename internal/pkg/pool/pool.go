@@ -1,6 +1,9 @@
 package pool
 
-import "graduation_design/internal/pkg/logs"
+import (
+	"graduation_design/internal/pkg/logs"
+	"time"
+)
 
 type Task func()
 type Pool struct{
@@ -39,8 +42,18 @@ func (p *Pool)Run(){
 	}
 }
 
+func (p *Pool)WaitWithTimeOut(t time.Duration){
+	select{
+	case <-p.allFinishChan:
+	case <-time.After(t):
+	}
+	
+	p.destroy()
+}
+
 func (p *Pool)Wait(){
-	<-p.allFinishChan
+
+	_=<-p.allFinishChan
 	p.destroy()
 }
 

@@ -29,219 +29,227 @@ func AnalysisProjectOverview(token string, projectId int) (map[string]interface{
 		return nil, err
 	}
 	//go routine 1,for analysisByLabguage
-	var languageChan=make(chan map[string]interface{})
-	go func(){
-		res,err:=analysisByLanguageAndCommitNum(prj.SSHUrl)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			languageChan<-map[string]interface{}{}
+	var languageChan = make(chan map[string]interface{})
+	go func() {
+		res, err := analysisByLanguageAndCommitNum(prj.SSHUrl)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			languageChan <- map[string]interface{}{}
 		}
-		languageChan<-res
+		languageChan <- res
 	}()
-	
+
 	//goroutine 2 for issue statistic
-	var issueStatisticChan=make(chan int)
-	go func(){
-		res,err:= GetProjectIssueNum(token,projectId)
-		if err!=nil{
-			logs.Error("error when GetProjectIssueStatistic,%s",err.Error())
-			issueStatisticChan<--1
+	var issueStatisticChan = make(chan int)
+	go func() {
+		res, err := GetProjectIssueNum(token, projectId)
+		if err != nil {
+			logs.Error("error when GetProjectIssueStatistic,%s", err.Error())
+			issueStatisticChan <- -1
 		}
-		issueStatisticChan<-res
+		issueStatisticChan <- res
 	}()
 
 	//goroutine3 for mr statistic
-	var mrCountsChan=make(chan int)
-	go func(){
-		total,err:=GetProjectMrNum(token,projectId)
-		if err!=nil{
-			logs.Error("error when get project mr nums:%s",err.Error())
-			mrCountsChan<--1
+	var mrCountsChan = make(chan int)
+	go func() {
+		total, err := GetProjectMrNum(token, projectId)
+		if err != nil {
+			logs.Error("error when get project mr nums:%s", err.Error())
+			mrCountsChan <- -1
 		}
-		mrCountsChan<-total
+		mrCountsChan <- total
 	}()
 
-	
+	languageResult := <-languageChan
 
-	languageResult:=<-languageChan
+	issueResult := <-issueStatisticChan
+	languageResult["issueNum"] = issueResult
 
-	issueResult:=<-issueStatisticChan
-	languageResult["issueNum"]=issueResult
+	mrCount := <-mrCountsChan
+	languageResult["mrnum"] = mrCount
 
-	mrCount:=<-mrCountsChan
-	languageResult["mrnum"]=mrCount
-
-
-	return languageResult,nil
+	return languageResult, nil
 
 }
 
 /*2. 开发者视角 对于每一个开发者展示
-		此人提交代码总行数
-		此人提交的语言分布
-		此人commit列表或概况图
-		此人issue列表或概况图
-		此人comment列表或概况图*/
+此人提交代码总行数
+此人提交的语言分布
+此人commit列表或概况图
+此人issue列表或概况图
+此人comment列表或概况图*/
 
-func AnalyzeUserView(token string,projectId int)(map[string]interface{},error){
+func AnalyzeUserView(token string, projectId int) (map[string]interface{}, error) {
 	prj, err := getProjectFromGitlab(token, projectId)
 	if err != nil {
 		return nil, err
 	}
-	
-	var languageChan=make(chan map[string]interface{})
-	var commitsChan=make(chan []git.GitCommit)
-	var gitlabCommitChan=make(chan map[string]GitlabCommit)
+
+	var languageChan = make(chan map[string]interface{})
+	var commitsChan = make(chan []git.GitCommit)
+	var gitlabCommitChan = make(chan map[string]GitlabCommit)
 	//go routine 1,for analysisByLabguage
-	go func(){
-		res,commits,err:=analysisByLanguageAndCommitList(prj.SSHUrl)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			languageChan<-map[string]interface{}{}
-			commitsChan<-nil
+	go func() {
+		res, commits, err := analysisByLanguageAndCommitList(prj.SSHUrl)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			languageChan <- map[string]interface{}{}
+			commitsChan <- nil
 		}
-		languageChan<-res
-		commitsChan<-commits
+		languageChan <- res
+		commitsChan <- commits
 	}()
-	go func(){
-		res,err:=GetAllCommitsInMap(token,projectId)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			gitlabCommitChan<-nil
+	go func() {
+		res, err := GetAllCommitsInMap(token, projectId)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			gitlabCommitChan <- nil
 		}
-		gitlabCommitChan<-res
+		gitlabCommitChan <- res
 	}()
 
-	languageResult:=<-languageChan
-	commitResult:=<-commitsChan
-	gitlabCommitResult:=<-gitlabCommitChan
-	fullCommits,gitAuthorToGitlabUser:=mergeCommitsFromGitAndGitlab(commitResult,gitlabCommitResult)
-	languageResult["commitList"]=fullCommits
-	languageResult["gitAuthorToGitlabUser"]=gitAuthorToGitlabUser
-	
-	
+	languageResult := <-languageChan
+	commitResult := <-commitsChan
+	gitlabCommitResult := <-gitlabCommitChan
+	fullCommits, gitAuthorToGitlabUser := mergeCommitsFromGitAndGitlab(commitResult, gitlabCommitResult)
+	languageResult["commitList"] = fullCommits
+	languageResult["gitAuthorToGitlabUser"] = gitAuthorToGitlabUser
+
 	//logs.Warning("commits:%d,gitlab:%d",len(commitResult),len(gitlabCommitResult))
 
-	return languageResult,nil
+	return languageResult, nil
 
 }
 
-func AnalyzeLanguageView(token string, projectId int) (map[string]interface{}, error){
+func AnalyzeLanguageView(token string, projectId int) (map[string]interface{}, error) {
 	prj, err := getProjectFromGitlab(token, projectId)
 	if err != nil {
 		return nil, err
 	}
-	res,err:=analysisByLanguageAndCommitNum(prj.SSHUrl)
-	if err!=nil{
-		logs.Error("error when analysisByLanguage,%s",err.Error())
-		return nil,err
+	res, err := analysisByLanguageAndCommitNum(prj.SSHUrl)
+	if err != nil {
+		logs.Error("error when analysisByLanguage,%s", err.Error())
+		return nil, err
 	}
-	return res,nil
+	return res, nil
 }
 
-
-func AnalyzeCommitView(token string, projectId int)([]FullCommit,error){
+func AnalyzeCommitView(token string, projectId int) ([]FullCommit, error) {
 	prj, err := getProjectFromGitlab(token, projectId)
 	if err != nil {
 		return nil, err
 	}
 
-	var commitsChan=make(chan []git.GitCommit)
-	var gitlabCommitChan=make(chan map[string]GitlabCommit)
-	go func(){
-		res,err:=analysisByCommit(prj.SSHUrl)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-		
+	var commitsChan = make(chan []git.GitCommit)
+	var gitlabCommitChan = make(chan map[string]GitlabCommit)
+	go func() {
+		res, err := analysisByCommit(prj.SSHUrl)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+
 		}
-		
-		commitsChan<-res
+
+		commitsChan <- res
 	}()
-	go func(){
-		res,err:=GetAllCommitsInMap(token,projectId)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			gitlabCommitChan<-nil
+	go func() {
+		res, err := GetAllCommitsInMap(token, projectId)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			gitlabCommitChan <- nil
 		}
-		gitlabCommitChan<-res
+		gitlabCommitChan <- res
 	}()
 
-
-	commitResult:=<-commitsChan
-	gitlabCommitResult:=<-gitlabCommitChan
-	fullCommits,_:=mergeCommitsFromGitAndGitlab(commitResult,gitlabCommitResult)
-	return fullCommits,nil
+	commitResult := <-commitsChan
+	gitlabCommitResult := <-gitlabCommitChan
+	fullCommits, _ := mergeCommitsFromGitAndGitlab(commitResult, gitlabCommitResult)
+	return fullCommits, nil
 
 }
 
-func AnalyzeActivityView(token string,projectId int)(map[string]interface{},error){
+func AnalyzeActivityView(token string, projectId int) (map[string]interface{}, error) {
 	prj, err := getProjectFromGitlab(token, projectId)
 	if err != nil {
 		return nil, err
 	}
-	var issueChan=make(chan []map[string]interface{})
-	var mrChan=make(chan []map[string]interface{})
-	var languageChan=make(chan map[string]interface{})
-	var commitsChan=make(chan []git.GitCommit)
-	var gitlabCommitChan=make(chan map[string]GitlabCommit)
+	var issueChan = make(chan []map[string]interface{})
+	var mrChan = make(chan []map[string]interface{})
+	var languageChan = make(chan map[string]interface{})
+	var commitsChan = make(chan []git.GitCommit)
+	var gitlabCommitChan = make(chan map[string]GitlabCommit)
+	var issueNoteChan = make(chan []map[string]interface{})
+	var mrNoteChan = make(chan []map[string]interface{})
 	//go routine 1,for analysisByLabguage
-	go func(){
-		res,commits,err:=analysisByLanguageAndCommitList(prj.SSHUrl)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			languageChan<-map[string]interface{}{}
-			commitsChan<-nil
+	go func() {
+		res, commits, err := analysisByLanguageAndCommitList(prj.SSHUrl)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			languageChan <- map[string]interface{}{}
+			commitsChan <- nil
 		}
-		languageChan<-res
-		commitsChan<-commits
+		languageChan <- res
+		commitsChan <- commits
 	}()
-	go func(){
-		res,err:=GetAllCommitsInMap(token,projectId)
-		if err!=nil{
-			logs.Error("error when analysisByLanguage,%s",err.Error())
-			gitlabCommitChan<-nil
+	go func() {
+		res, err := GetAllCommitsInMap(token, projectId)
+		if err != nil {
+			logs.Error("error when analysisByLanguage,%s", err.Error())
+			gitlabCommitChan <- nil
 		}
-		gitlabCommitChan<-res
+		gitlabCommitChan <- res
 	}()
-	go func(){
-		res,err:=GetAllProjectIssueInObject(token,projectId)
-		if err!=nil{
+	go func() {
+		res, err := GetAllProjectIssueInObject(token, projectId)
+		if err != nil {
 			logs.Error("get all issue failed when AnalysisByActivity")
-			issueChan<-nil
+			issueChan <- nil
 		}
-		issueChan<-res
+		issueChan <- res
 	}()
 
-	go func(){
-		res,err:=GetAllProjectMrInObject(token,projectId)
-		if err!=nil{
+	go func() {
+		res, err := GetAllProjectMrInObject(token, projectId)
+		if err != nil {
 			logs.Error("get all issue failed when AnalysisByActivity")
-			mrChan<-nil
+			mrChan <- nil
 		}
-		mrChan<-res
+		mrChan <- res
 	}()
 
-	languageResult:=<-languageChan
-	commitResult:=<-commitsChan
-	gitlabCommitResult:=<-gitlabCommitChan
-	fullCommits,gitAuthorToGitlabUser:=mergeCommitsFromGitAndGitlab(commitResult,gitlabCommitResult)
-	
-	allIssues:=<-issueChan
-	allMrs:=<-mrChan
+	go func() {
+		res, _ := GetAllIssueNotes(token, projectId)
+		issueNoteChan <- res
+	}()
+	go func() {
+		res, _ := GetAllMRNotes(token, projectId)
+		mrNoteChan <- res
+	}()
+
+	languageResult := <-languageChan
+	commitResult := <-commitsChan
+	gitlabCommitResult := <-gitlabCommitChan
+	fullCommits, gitAuthorToGitlabUser := mergeCommitsFromGitAndGitlab(commitResult, gitlabCommitResult)
+	notes := <-issueNoteChan
+	mrnotes := <-mrChan
+	notes = append(notes, mrnotes...)
+
+	allIssues := <-issueChan
+	allMrs := <-mrChan
 	return map[string]interface{}{
-		"issues":allIssues,
-		"mrs":allMrs,
-		"language":languageResult,
-		"commit":fullCommits,
-		"gitAuthorToGitlabUser":gitAuthorToGitlabUser,
-	},nil
+		"issues":                allIssues,
+		"mrs":                   allMrs,
+		"language":              languageResult,
+		"commit":                fullCommits,
+		"gitAuthorToGitlabUser": gitAuthorToGitlabUser,
+		"note":                  notes,
+	}, nil
 }
-	
 
-func analysisByLanguageAndCommitList(ssh string)(map[string]interface{},[]git.GitCommit,error){
+func analysisByLanguageAndCommitList(ssh string) (map[string]interface{}, []git.GitCommit, error) {
 	g, err := git.NewGit(ssh, config.CACHEDIR, true)
 	if err != nil {
-		return nil,nil, err
+		return nil, nil, err
 	}
 	defer g.Clear()
 	files, err := g.GetAllTrackedFiles()
@@ -286,10 +294,10 @@ func analysisByLanguageAndCommitList(ssh string)(map[string]interface{},[]git.Gi
 		}
 		linesByLanguageByAuthor[info.Suffix][info.Author]++
 	})
-	var commitList=make([]git.GitCommit,0)
+	var commitList = make([]git.GitCommit, 0)
 
-	g.ReadAllCommit(func(gitlog string){
-		res,_:=git.ResolveGitlog(gitlog)
+	g.ReadAllCommit(func(gitlog string) {
+		res, _ := git.ResolveGitlog(gitlog)
 		commitList = append(commitList, res)
 	})
 	return map[string]interface{}{
@@ -298,10 +306,10 @@ func analysisByLanguageAndCommitList(ssh string)(map[string]interface{},[]git.Gi
 		"linesByAuthor":           linesByAuthor,
 		"linesByAuthorByLanguage": linesByAuthorLanguage,
 		"linesByLanguageByAuthor": linesByLanguageByAuthor,
-	},commitList, nil
+	}, commitList, nil
 }
 
-func analysisByLanguageAndCommitNum(ssh string)(map[string]interface{},error){
+func analysisByLanguageAndCommitNum(ssh string) (map[string]interface{}, error) {
 	g, err := git.NewGit(ssh, config.CACHEDIR, true)
 	if err != nil {
 		return nil, err
@@ -314,7 +322,7 @@ func analysisByLanguageAndCommitNum(ssh string)(map[string]interface{},error){
 	var linesByAuthor = make(map[string]int)
 	var linesByAuthorLanguage = make(map[string]map[string]int)
 	var linesByLanguageByAuthor = make(map[string]map[string]int)
-	var commitNum=0
+	var commitNum = 0
 
 	g.BlameAllFile(files, func(filename, blame string) {
 		info, err := git.ResolveBlame(blame)
@@ -350,7 +358,7 @@ func analysisByLanguageAndCommitNum(ssh string)(map[string]interface{},error){
 		}
 		linesByLanguageByAuthor[info.Suffix][info.Author]++
 	})
-	g.ReadAllCommit(func(string){
+	g.ReadAllCommit(func(string) {
 		commitNum++
 	})
 	return map[string]interface{}{
@@ -359,12 +367,11 @@ func analysisByLanguageAndCommitNum(ssh string)(map[string]interface{},error){
 		"linesByAuthor":           linesByAuthor,
 		"linesByAuthorByLanguage": linesByAuthorLanguage,
 		"linesByLanguageByAuthor": linesByLanguageByAuthor,
-		"commitNum":commitNum,
+		"commitNum":               commitNum,
 	}, nil
 }
 
-
-func analysisByLanguage(ssh string)(map[string]interface{},error){
+func analysisByLanguage(ssh string) (map[string]interface{}, error) {
 	g, err := git.NewGit(ssh, config.CACHEDIR, true)
 	if err != nil {
 		return nil, err
@@ -422,17 +429,17 @@ func analysisByLanguage(ssh string)(map[string]interface{},error){
 	}, nil
 }
 
-func analysisByCommit(ssh string)([]git.GitCommit,error){
+func analysisByCommit(ssh string) ([]git.GitCommit, error) {
 	g, err := git.NewGit(ssh, config.CACHEDIR, true)
 	if err != nil {
 		return nil, err
 	}
 	defer g.Clear()
-	var commitList=make([]git.GitCommit,0)
+	var commitList = make([]git.GitCommit, 0)
 
-	g.ReadAllCommit(func(gitlog string){
-		res,_:=git.ResolveGitlog(gitlog)
+	g.ReadAllCommit(func(gitlog string) {
+		res, _ := git.ResolveGitlog(gitlog)
 		commitList = append(commitList, res)
 	})
-	return commitList,nil
+	return commitList, nil
 }
