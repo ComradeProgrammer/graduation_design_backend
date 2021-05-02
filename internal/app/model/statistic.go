@@ -231,7 +231,7 @@ func AnalyzeActivityView(token string, projectId int) (map[string]interface{}, e
 	gitlabCommitResult := <-gitlabCommitChan
 	fullCommits, gitAuthorToGitlabUser := mergeCommitsFromGitAndGitlab(commitResult, gitlabCommitResult)
 	notes := <-issueNoteChan
-	mrnotes := <-mrChan
+	mrnotes := <-mrNoteChan
 	notes = append(notes, mrnotes...)
 
 	allIssues := <-issueChan
