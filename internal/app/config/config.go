@@ -33,5 +33,5 @@ const (
 	COVERAGE string = "check-coverage-job"
 	LINT     string = "check-quality-job"
 
-	MAINPAGE string = "http://127.0.0.1:8081"
+	MAINPAGE string = "http://127.0.0.1:3333"
 )

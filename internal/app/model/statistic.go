@@ -4,6 +4,7 @@ import (
 	"graduation_design/internal/app/config"
 	"graduation_design/internal/pkg/git"
 	"graduation_design/internal/pkg/logs"
+	"math"
 )
 
 //这次修改之后，我究竟需要怎样的需求呢？
@@ -236,6 +237,7 @@ func AnalyzeActivityView(token string, projectId int) (map[string]interface{}, e
 
 	allIssues := <-issueChan
 	allMrs := <-mrChan
+	fcc,_:=AnalysisFCC(prj.SSHUrl)
 	return map[string]interface{}{
 		"issues":                allIssues,
 		"mrs":                   allMrs,
@@ -243,6 +245,7 @@ func AnalyzeActivityView(token string, projectId int) (map[string]interface{}, e
 		"commit":                fullCommits,
 		"gitAuthorToGitlabUser": gitAuthorToGitlabUser,
 		"note":                  notes,
+		"fcc":fcc,
 	}, nil
 }
 
@@ -307,6 +310,67 @@ func analysisByLanguageAndCommitList(ssh string) (map[string]interface{}, []git.
 		"linesByAuthorByLanguage": linesByAuthorLanguage,
 		"linesByLanguageByAuthor": linesByLanguageByAuthor,
 	}, commitList, nil
+}
+
+
+func AnalysisFCC(ssh string)(map[string]float64,error){
+	g, err := git.NewGit(ssh, config.CACHEDIR, true)
+	if err != nil {
+		return nil, err
+	}
+	defer g.Clear()
+	files, err := g.GetAllTrackedFiles()
+	var days =make(map[string]map[string]int)
+	g.BlameAllFile(files,func(filename,blame string){
+		info, err := git.ResolveBlame(blame)
+		if err != nil {
+			return
+		}
+		date:=info.Date
+		_,ok:=days[date]
+		if !ok{
+			days[date]=make(map[string]int)
+		}
+		_,ok=days[date][filename]
+		if !ok{
+			days[date][filename]=0
+		}
+		days[date][filename]++
+
+	})
+	var res map[string]float64=make(map[string]float64)
+	for k,v:=range days{
+		lines:=make([]int,0)
+		props:=make([]float64,0)
+		for _,line:=range v{
+			lines=append(lines, line)
+			props=append(props,0)
+		}
+		sum:=0
+		for _,l:=range lines{
+			sum+=l
+		}
+
+		if sum==0{
+			res[k]=0
+		}else{
+			for i,l:=range lines{
+				props[i]=float64(l)/float64(sum)
+			}
+			var entropy float64=0.0
+			if len(props)>1{
+				for _,p:=range props{
+					entropy-=p*math.Log(p)/math.Log(float64(len(props)))
+				}
+			}
+			
+			res[k]=entropy
+
+		}
+	}
+	return res,nil
+
+
 }
 
 func analysisByLanguageAndCommitNum(ssh string) (map[string]interface{}, error) {

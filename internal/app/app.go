@@ -56,6 +56,9 @@ func Run() {
 	server.GET("/api/projects/statistic/activity", handler.GetProjectActivityStatistic)
 	//tests
 	server.GET("/api/test", handler.Test)
+	//load frontend files
+	// server.StaticFile("/","frontend/index.html")
+	// server.Static("/assets", "frontend/assets")
 	//run server
 
 	server.Run(config.APPPORT)
